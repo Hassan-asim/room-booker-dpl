@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          room_id: string
+          start_time: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          room_id: string
+          start_time: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          room_id?: string
+          start_time?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rooms: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
