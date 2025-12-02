@@ -1,73 +1,172 @@
-# Welcome to your Lovable project
+# Meeting Room Booker
 
-## Project info
+A modern, production-ready meeting room booking management system built with React, TypeScript, Node.js, and Prisma.
 
-**URL**: https://lovable.dev/projects/7896e9fb-dd59-4f68-9f4d-921f83dd6a4d
+**Made by Sufi Hassan Asim**
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+### User Features
+- 📅 **Interactive Calendar** - View and book meeting rooms with an intuitive calendar interface
+- 🎨 **Modern UI** - Beautiful red/white/charcoal theme with dark mode support
+- 📱 **Responsive Design** - Works seamlessly on desktop, tablet, and mobile devices
+- 🔄 **Real-time Updates** - Socket.IO integration for live booking updates
+- ✅ **Smart Validation** - Prevents double bookings and validates capacity
+- 🌓 **Dark Mode** - Toggle between light and dark themes
 
-**Use Lovable**
+### Admin Features
+- 🔐 **Secure Authentication** - JWT-based admin login with database-stored credentials
+- 🏢 **Room Management** - Create, update, and delete meeting rooms
+- 📊 **Dashboard** - View all bookings in calendar and table formats
+- ⏱️ **Meeting Control** - End meetings early when needed
+- 🎨 **Color Coding** - Assign custom colors to rooms for easy identification
+- 📈 **Booking Analytics** - Track room usage and booking status
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7896e9fb-dd59-4f68-9f4d-921f83dd6a4d) and start prompting.
+### Technical Features
+- ⚡ **Real-time Scheduling** - Automatic status updates (CONFIRMED → IN_PROGRESS → ENDED)
+- 🔒 **Protected Routes** - Admin panel requires authentication
+- 🗄️ **Database Integration** - SQLite for easy local development
+- 🚀 **Production Ready** - Proper error handling, validation, and security
+- 🎯 **Edge Case Handling** - Prevents overlaps, validates times, checks capacity
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tech Stack
 
-**Use your preferred IDE**
+### Frontend
+- **React 18** with TypeScript
+- **Ant Design** for UI components
+- **FullCalendar** for calendar views
+- **Socket.IO Client** for real-time updates
+- **Tailwind CSS** for styling
+- **Vite** for build tooling
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend
+- **Node.js** with Express
+- **Prisma ORM** with SQLite
+- **Socket.IO** for WebSocket communication
+- **JWT** for authentication
+- **bcrypt** for password hashing
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+### Prerequisites
+- Node.js 18+ installed
+- npm or yarn package manager
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. **Install frontend dependencies:**
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. **Install backend dependencies:**
+```bash
+cd server
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. **Setup database:**
+```bash
+cd server
+npx prisma db push
+npx ts-node seed.ts
+```
+
+### Running the Application
+
+You need to run both servers:
+
+**Terminal 1 - Backend:**
+```bash
+cd server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+**Terminal 2 - Frontend:**
+```bash
+npm run dev
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Access the Application
 
-**Use GitHub Codespaces**
+- **User Interface**: http://localhost:8080
+- **Admin Panel**: http://localhost:8080/admin
+- **Admin Login**: 
+  - Email: `admin@dplit.com`
+  - Password: `123456789`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+room-booker-dpl/
+├── src/                      # Frontend source
+│   ├── components/          # React components
+│   ├── pages/              # Page components
+│   └── index.css           # Global styles
+├── server/                  # Backend source
+│   ├── src/
+│   │   ├── routes/         # API routes
+│   │   ├── index.ts        # Server entry
+│   │   ├── scheduler.ts    # Meeting scheduler
+│   │   └── socket.ts       # WebSocket setup
+│   ├── prisma/
+│   │   └── schema.prisma   # Database schema
+│   └── seed.ts             # Database seeder
+└── public/                  # Static assets
+    ├── logo.png            # Rebel logo
+    └── banner.png          # Banner image
+```
 
-This project is built with:
+## API Endpoints
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Public Endpoints
+- `POST /api/bookings` - Create a new booking
+- `GET /api/bookings` - Get bookings (with filters)
+- `GET /api/admin/rooms` - Get all rooms
 
-## How can I deploy this project?
+### Admin Endpoints (Requires Authentication)
+- `POST /api/admin/login` - Admin login
+- `POST /api/admin/rooms` - Create room
+- `PUT /api/admin/rooms/:id` - Update room
+- `DELETE /api/admin/rooms/:id` - Delete room
+- `GET /api/admin/bookings` - Get all bookings
+- `PUT /api/admin/bookings/:id/end` - End meeting early
 
-Simply open [Lovable](https://lovable.dev/projects/7896e9fb-dd59-4f68-9f4d-921f83dd6a4d) and click on Share -> Publish.
+## Security Features
 
-## Can I connect a custom domain to my Lovable project?
+- ✅ JWT-based authentication
+- ✅ Password hashing with bcrypt
+- ✅ Protected admin routes
+- ✅ Input validation on all endpoints
+- ✅ SQL injection prevention (Prisma ORM)
+- ✅ CORS configuration
+- ✅ Error handling and logging
 
-Yes, you can!
+## Edge Cases Handled
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. **Double Booking Prevention** - Checks for overlapping bookings
+2. **Capacity Validation** - Ensures attendees don't exceed room capacity
+3. **Time Validation** - End time must be after start time
+4. **Room Deletion** - Prevents deletion of rooms with future bookings
+5. **Token Expiry** - JWT tokens expire after 8 hours
+6. **Real-time Sync** - Socket.IO ensures all clients see updates
+7. **Timezone Handling** - All times stored in ISO format
+8. **Responsive Design** - Works on all device sizes
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Future Enhancements
+
+- Email notifications for bookings
+- Recurring meetings support
+- Room amenities and features
+- User profiles and booking history
+- Calendar export (iCal)
+- Multi-language support
+- Advanced analytics dashboard
+
+## License
+
+This project is created by Sufi Hassan Asim.
+
+## Support
+
+For issues or questions, please contact the development team.

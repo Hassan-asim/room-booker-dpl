@@ -1,0 +1,49 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model UserBooking {
+  id           String   @id @default(cuid())
+  name         String
+  workEmail    String
+  phone        String
+  title        String
+  roomId       String
+  startAt      DateTime
+  endAt        DateTime
+  slots        Int      // number of slots requested (if you model slots as duration units)
+  numAttendees Int
+  status       String @default("PENDING") // PENDING, CONFIRMED, IN_PROGRESS, ENDED, CANCELLED
+  checkedIn    Boolean @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  notes        String?
+  
+  room         Room     @relation(fields: [roomId], references: [id])
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  name        String
+  color       String
+  capacity    Int
+  slotDurationMinutes Int  // duration of a slot (e.g., 30)
+  availableFrom Int   // minutes from midnight or store as time string (e.g., "08:00")
+  availableTo   Int   // minutes from midnight
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    UserBooking[]
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
