@@ -95,6 +95,18 @@ npm run dev
   - Email: `admin@dplit.com`
   - Password: `123456789`
 
+## Deployment
+
+### Backend (Render + GitHub Actions)
+1. Create a Render Web Service that points to the `server/` directory (build command: `npm install && npm run build`, start command: `npm run start`) and configure its environment variables (`DATABASE_URL`, JWT secrets, etc.).
+2. Copy the service’s **Deploy Hook** URL from Render.
+3. In GitHub, add a repository secret named `RENDER_DEPLOY_HOOK_URL` with that hook URL.
+4. Push changes to `main` (or use the “Run workflow” button) and the workflow in `.github/workflows/deploy-server.yml` will:
+   - install server dependencies,
+   - run Prisma generate,
+   - build the server, and
+   - call the Render deploy hook to release a new version.
+
 ## Project Structure
 
 ```
