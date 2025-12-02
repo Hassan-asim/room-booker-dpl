@@ -74,8 +74,7 @@ const Admin = () => {
   const handleAddRoom = async (values: any) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/rooms", {
-        const res = await fetch(`${API_BASE_URL}/api/admin/rooms`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +113,6 @@ const Admin = () => {
       okType: 'danger',
       onOk: async () => {
         try {
-          const res = await fetch(`/api/admin/rooms/${id}`, {
           const res = await fetch(`${API_BASE_URL}/api/admin/rooms/${id}`, {
             method: 'DELETE',
             headers: getAuthHeader()
@@ -160,7 +158,6 @@ const Admin = () => {
       onOk: async () => {
         if (booking.status === 'IN_PROGRESS') {
           try {
-            const res = await fetch(`/api/admin/bookings/${booking.id}/end`, {
             const res = await fetch(`${API_BASE_URL}/api/admin/bookings/${booking.id}/end`, {
               method: 'PUT',
               headers: getAuthHeader()
