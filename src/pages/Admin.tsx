@@ -11,6 +11,8 @@ import dayjs from 'dayjs';
 const { Header, Content } = Layout;
 const { confirm } = Modal;
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 interface Room {
   id: string;
   name: string;
@@ -51,7 +53,7 @@ const Admin = () => {
 
   const fetchRooms = async () => {
     try {
-      const res = await fetch("/api/admin/rooms");
+      const res = await fetch(`${API_BASE_URL}/api/admin/rooms`);
       const data = await res.json();
       setRooms(data);
     } catch (error) {
@@ -61,7 +63,7 @@ const Admin = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch("/api/admin/bookings");
+      const res = await fetch(`${API_BASE_URL}/api/admin/bookings`);
       const data = await res.json();
       setBookings(data);
     } catch (error) {
@@ -73,6 +75,7 @@ const Admin = () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/rooms", {
+        const res = await fetch(`${API_BASE_URL}/api/admin/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,6 +115,7 @@ const Admin = () => {
       onOk: async () => {
         try {
           const res = await fetch(`/api/admin/rooms/${id}`, {
+          const res = await fetch(`${API_BASE_URL}/api/admin/rooms/${id}`, {
             method: 'DELETE',
             headers: getAuthHeader()
           });
@@ -157,6 +161,7 @@ const Admin = () => {
         if (booking.status === 'IN_PROGRESS') {
           try {
             const res = await fetch(`/api/admin/bookings/${booking.id}/end`, {
+            const res = await fetch(`${API_BASE_URL}/api/admin/bookings/${booking.id}/end`, {
               method: 'PUT',
               headers: getAuthHeader()
             });

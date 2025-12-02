@@ -12,6 +12,8 @@ import dayjs from 'dayjs';
 
 const { Header, Content } = Layout;
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 export default function Index() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -24,7 +26,7 @@ export default function Index() {
     fetchRooms();
     fetchBookings();
 
-    const socket = io();
+    const socket = io(API_BASE_URL || undefined);
     socket.on('booking.created', (booking) => {
       setBookings(prev => [...prev, booking]);
       message.success('New booking created!');
@@ -39,7 +41,7 @@ export default function Index() {
 
   const fetchRooms = async () => {
     try {
-      const res = await fetch('/api/admin/rooms');
+      const res = await fetch(`${API_BASE_URL}/api/admin/rooms`);
       const data = await res.json();
       setRooms(data);
       if (data.length > 0) setSelectedRoom(data[0]);
@@ -52,7 +54,7 @@ export default function Index() {
     try {
       const from = dayjs().subtract(1, 'month').toISOString();
       const to = dayjs().add(3, 'months').toISOString();
-      const res = await fetch(`/api/bookings?from=${from}&to=${to}`);
+      const res = await fetch(`${API_BASE_URL}/api/bookings?from=${from}&to=${to}`);
       const data = await res.json();
       setBookings(data);
     } catch (error) {
@@ -70,7 +72,7 @@ export default function Index() {
       const startAt = values.slotDate.hour(values.slotTimeStart.hour()).minute(values.slotTimeStart.minute()).toISOString();
       const endAt = values.slotDate.hour(values.slotTimeEnd.hour()).minute(values.slotTimeEnd.minute()).toISOString();
 
-      const res = await fetch('/api/bookings', {
+      const res = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
