@@ -18,6 +18,9 @@ interface Room {
   name: string;
   capacity: number;
   color: string;
+  slotDurationMinutes: number;
+  availableFrom: number; // minutes from midnight
+  availableTo: number;   // minutes from midnight
 }
 
 interface Booking {
@@ -37,8 +40,11 @@ interface Booking {
 const Admin = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [form] = Form.useForm();
+  const [addRoomForm] = Form.useForm();
+  const [editRoomForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -74,6 +80,9 @@ const Admin = () => {
   const handleAddRoom = async (values: any) => {
     setLoading(true);
     try {
+      const availableFromMinutes = values.availableFrom ? values.availableFrom.hour() * 60 + values.availableFrom.minute() : 480; // Default 8:00 AM
+      const availableToMinutes = values.availableTo ? values.availableTo.hour() * 60 + values.availableTo.minute() : 1080; // Default 6:00 PM
+
       const res = await fetch(`${API_BASE_URL}/api/admin/rooms`, {
         method: "POST",
         headers: {
@@ -83,15 +92,15 @@ const Admin = () => {
         body: JSON.stringify({
           ...values,
           color: typeof values.color === 'string' ? values.color : values.color.toHexString(),
-          slotDurationMinutes: 30,
-          availableFrom: 480,
-          availableTo: 1200
+          availableFrom: availableFromMinutes,
+          availableTo: availableToMinutes,
+          slotDurationMinutes: values.slotDurationMinutes || 30
         }),
       });
 
       if (res.ok) {
         message.success("Room added successfully!");
-        form.resetFields();
+        addRoomForm.resetFields();
         fetchRooms();
       } else {
         const err = await res.json();
@@ -103,6 +112,7 @@ const Admin = () => {
       setLoading(false);
     }
   };
+
 
   const handleDeleteRoom = async (id: string) => {
     confirm({

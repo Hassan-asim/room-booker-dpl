@@ -38,23 +38,23 @@
   }
 
   .dark {
-    --background: 0 0% 12%; /* Dark Charcoal */
+    --background: 0 0% 8%;   /* Darker background */
     --foreground: 0 0% 98%;
     
-    --card: 0 0% 15%;
+    --card: 0 0% 12%;   /* Noticeably lighter than background */
     --card-foreground: 0 0% 98%;
     
-    --popover: 0 0% 15%;
+    --popover: 0 0% 12%;
     --popover-foreground: 0 0% 98%;
     
     --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 0 0% 20%;
+    --secondary: 0 0% 18%;   /* Lighter than card */
     --secondary-foreground: 0 0% 98%;
     
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 0 0% 25%;   /* Lighter than secondary */
+    --muted-foreground: 0 0% 70%;  /* Lighter muted foreground */
     
     --accent: 0 84% 60%;
     --accent-foreground: 0 0% 100%;
@@ -62,8 +62,8 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
+    --border: 0 0% 30%;   /* Lighter border */
+    --input: 0 0% 30%;    /* Lighter input */
     --ring: 0 84% 60%;
   }
 }
@@ -85,7 +85,7 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-800/50;
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50;
   }
   
   .gradient-red {
@@ -143,11 +143,11 @@
 
 .fc-theme-standard td,
 .fc-theme-standard th {
-  @apply border-gray-200 dark:border-gray-700;
+  @apply border-gray-200 dark:border-gray-600;
 }
 
 .fc-theme-standard .fc-scrollgrid {
-  @apply border-gray-200 dark:border-gray-700;
+  @apply border-gray-200 dark:border-gray-600;
 }
 
 .fc .fc-daygrid-day-number {
@@ -159,7 +159,7 @@
 }
 
 .fc .fc-timegrid-slot-label-cushion {
-  @apply text-gray-600 dark:text-gray-400;
+  @apply text-gray-600 dark:text-gray-300;
 }
 
 .fc-event {

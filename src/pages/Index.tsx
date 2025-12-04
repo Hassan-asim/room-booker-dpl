@@ -4,11 +4,12 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Layout, message, Button, Select, Card, Badge, Tooltip } from 'antd';
-import { CalendarOutlined, PlusOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
+import { CalendarOutlined, PlusOutlined, MoonOutlined, SunOutlined, UserOutlined } from '@ant-design/icons';
 import { BookingModal } from '../components/BookingModal';
 import { useTheme } from '../components/theme-provider';
 import io from 'socket.io-client';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 
 const { Header, Content } = Layout;
 
@@ -21,6 +22,7 @@ export default function Index() {
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRooms();
@@ -148,6 +150,15 @@ export default function Index() {
           >
             <span className="hidden md:inline">Book Now</span>
           </Button>
+
+          <Tooltip title="Admin Panel">
+            <Button
+              icon={<UserOutlined />}
+              onClick={() => navigate('/admin')}
+              shape="circle"
+              size="large"
+            />
+          </Tooltip>
         </div>
       </Header>
 
@@ -159,28 +170,60 @@ export default function Index() {
       </div>
 
       <Content className="p-4 md:p-8 max-w-7xl mx-auto w-full animate-fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {rooms.slice(0, 4).map(room => (
-            <Card
-              key={room.id}
-              className="glass hover:shadow-lg transition-all cursor-pointer"
-              onClick={() => setSelectedRoom(room)}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: room.color }} />
-                    <h3 className="font-semibold">{room.name}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+          {rooms.map(room => {
+            const now = dayjs();
+            const roomBookings = bookings
+              .filter(b => b.roomId === room.id && b.status !== 'CANCELLED')
+              .sort((a, b) => dayjs(a.startAt).valueOf() - dayjs(b.startAt).valueOf());
+
+            const currentBooking = roomBookings.find(b => now.isAfter(dayjs(b.startAt)) && now.isBefore(dayjs(b.endAt)));
+            const nextBooking = roomBookings.find(b => now.isBefore(dayjs(b.startAt)));
+
+            const status = currentBooking ? 'Busy' : 'Available';
+            const statusColor = currentBooking ? 'bg-red-500' : 'bg-green-500';
+
+            return (
+              <Card
+                key={room.id}
+                className="glass hover:shadow-lg transition-all cursor-pointer border-t-4"
+                style={{ borderTopColor: room.color }}
+                onClick={() => setSelectedRoom(room)}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-lg">{room.name}</h3>
+                  <div className={`flex items-center gap-2 text-sm font-semibold px-2 py-1 rounded-full text-white ${statusColor}`}>
+                    <div className="w-2 h-2 rounded-full bg-white" />
+                    {status}
                   </div>
-                  <p className="text-sm text-gray-500">Capacity: {room.capacity}</p>
                 </div>
-                <Badge
-                  count={bookings.filter(b => b.roomId === room.id && b.status === 'IN_PROGRESS').length}
-                  style={{ backgroundColor: '#ef4444' }}
-                />
-              </div>
-            </Card>
-          ))}
+
+                <div className="space-y-3 text-sm">
+                  {currentBooking ? (
+                    <div>
+                      <p className="font-semibold text-red-500">Current Meeting:</p>
+                      <p className="truncate">{currentBooking.title}</p>
+                      <p className="text-gray-500">{dayjs(currentBooking.startAt).format('HH:mm')} - {dayjs(currentBooking.endAt).format('HH:mm')}</p>
+                    </div>
+                  ) : (
+                    <div className="text-green-500 font-semibold">
+                      <p>Free until {nextBooking ? dayjs(nextBooking.startAt).format('HH:mm') : 'end of day'}</p>
+                    </div>
+                  )}
+
+                  {nextBooking && !currentBooking && (
+                    <div>
+                      <p className="font-semibold">Next Meeting:</p>
+                      <p className="truncate">{nextBooking.title}</p>
+                      <p className="text-gray-500">{dayjs(nextBooking.startAt).format('HH:mm')} - {dayjs(nextBooking.endAt).format('HH:mm')}</p>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-gray-400 mt-4">Capacity: {room.capacity}</p>
+              </Card>
+            );
+          })}
         </div>
 
         <Card className="glass shadow-xl animate-slide-up">
