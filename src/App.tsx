@@ -3,25 +3,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, useLocation } from "react-router-dom"; // Updated import
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import MyBookings from "./pages/MyBookings";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/NotFound";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Route } from "react-router-dom"; // Updated import
 import { ThemeProvider } from "./components/theme-provider";
 import SplashScreen from './components/SplashScreen';
-import RoomStatusOverlay from './components/RoomStatusOverlay';
-import useIdleTimer from './hooks/useIdleTimer';
+import IdleOverlayHandler from './components/IdleOverlayHandler'; // Import IdleOverlayHandler
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const isIdle = useIdleTimer(120 * 1000); // 120 seconds (2 minutes) for screensaver
-  const [showOverlay, setShowOverlay] = useState(false);
-  const location = useLocation(); // Get current location
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,19 +19,6 @@ const App = () => {
     }, 3000); // Show splash screen for 3 seconds
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    // Only show overlay if idle and not on auth or admin pages
-    if (isIdle && location.pathname !== '/auth' && location.pathname !== '/admin') {
-      setShowOverlay(true);
-    } else {
-      setShowOverlay(false);
-    }
-  }, [isIdle, location.pathname]);
-
-  const dismissOverlay = () => {
-    setShowOverlay(false);
-  };
 
   if (showSplash) {
     return <SplashScreen />;
@@ -53,19 +30,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <> {/* Fragment instead of BrowserRouter */}
-            {showOverlay && <RoomStatusOverlay onClick={dismissOverlay} />}
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/my-bookings" element={<MyBookings />} />
-              <Route element={<ProtectedRoute />}>
-                <Route path="/admin" element={<Admin />} />
-              </Route>
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </>
+          <IdleOverlayHandler /> {/* Render IdleOverlayHandler */}
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
