@@ -7,7 +7,6 @@ import { Route } from "react-router-dom"; // Updated import
 import { ThemeProvider } from "./components/theme-provider";
 import SplashScreen from './components/SplashScreen';
 import IdleOverlayHandler from './components/IdleOverlayHandler'; // Import IdleOverlayHandler
-import PWAInstallPrompt from './components/PWAInstallPrompt'; // Import PWA Install Prompt
 
 const queryClient = new QueryClient();
 
@@ -32,7 +31,6 @@ const App = () => {
           <Toaster />
           <Sonner />
           <IdleOverlayHandler /> {/* Render IdleOverlayHandler */}
-          <PWAInstallPrompt /> {/* Render PWA Install Prompt */}
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

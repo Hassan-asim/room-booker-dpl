@@ -19,7 +19,8 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      // Removed includeAssets for explicit assets, VitePWA usually handles public dir implicitly
+      // We will rely on manifest icons and direct links in index.html for other assets.
       manifest: {
         name: 'Meeting Room Booker',
         short_name: 'Room Booker',
@@ -44,6 +45,7 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
+      base: '/', // Explicitly set base path
     }),
   ].filter(Boolean),
   resolve: {
