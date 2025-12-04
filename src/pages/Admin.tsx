@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Card, Form, Input, InputNumber, Button, List, message, ColorPicker, Tabs, Modal, Table, Tag, Space, Tooltip } from "antd";
-import { DeleteOutlined, ExclamationCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, LogoutOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { Layout, Card, Form, Input, InputNumber, Button, List, message, ColorPicker, Tabs, Modal, Table, Tag, Space, Tooltip, TimePicker } from "antd";
+import { DeleteOutlined, ExclamationCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, LogoutOutlined, MoonOutlined, SunOutlined, EditOutlined } from "@ant-design/icons";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -108,6 +108,46 @@ const Admin = () => {
       }
     } catch (error) {
       message.error("Error adding room");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditRoom = async (values: any) => {
+    if (!editingRoom) return;
+    
+    setLoading(true);
+    try {
+      const availableFromMinutes = values.availableFrom ? values.availableFrom.hour() * 60 + values.availableFrom.minute() : editingRoom.availableFrom;
+      const availableToMinutes = values.availableTo ? values.availableTo.hour() * 60 + values.availableTo.minute() : editingRoom.availableTo;
+
+      const res = await fetch(`${API_BASE_URL}/api/admin/rooms/${editingRoom.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({
+          ...values,
+          color: typeof values.color === 'string' ? values.color : values.color.toHexString(),
+          availableFrom: availableFromMinutes,
+          availableTo: availableToMinutes,
+          slotDurationMinutes: values.slotDurationMinutes || editingRoom.slotDurationMinutes
+        }),
+      });
+
+      if (res.ok) {
+        message.success("Room updated successfully!");
+        setIsEditModalVisible(false);
+        editRoomForm.resetFields();
+        setEditingRoom(null);
+        fetchRooms();
+      } else {
+        const err = await res.json();
+        message.error(err.error || "Failed to update room");
+      }
+    } catch (error) {
+      message.error("Error updating room");
     } finally {
       setLoading(false);
     }
@@ -326,12 +366,21 @@ const Admin = () => {
           <Tabs.TabPane tab="🏢 Room Management" key="2">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="glass shadow-xl" title="Add New Room">
-                <Form form={form} onFinish={handleAddRoom} layout="vertical">
+                <Form form={addRoomForm} onFinish={handleAddRoom} layout="vertical">
                   <Form.Item name="name" label="Room Name" rules={[{ required: true }]}>
                     <Input size="large" placeholder="e.g., Conference Room A" />
                   </Form.Item>
                   <Form.Item name="capacity" label="Capacity" rules={[{ required: true }]}>
                     <InputNumber min={1} size="large" className="w-full" placeholder="Number of people" />
+                  </Form.Item>
+                  <Form.Item name="slotDurationMinutes" label="Slot Duration (minutes)" initialValue={30}>
+                    <InputNumber min={15} step={15} size="large" className="w-full" />
+                  </Form.Item>
+                  <Form.Item name="availableFrom" label="Available From" initialValue={dayjs('08:00', 'HH:mm')}>
+                    <TimePicker format="HH:mm" size="large" className="w-full" />
+                  </Form.Item>
+                  <Form.Item name="availableTo" label="Available To" initialValue={dayjs('18:00', 'HH:mm')}>
+                    <TimePicker format="HH:mm" size="large" className="w-full" />
                   </Form.Item>
                   <Form.Item name="color" label="Color" initialValue="#ef4444">
                     <ColorPicker showText size="large" />
@@ -348,6 +397,24 @@ const Admin = () => {
                   renderItem={(room) => (
                     <List.Item
                       actions={[
+                        <Tooltip title="Edit Room">
+                          <Button
+                            type="text"
+                            icon={<EditOutlined />}
+                            onClick={() => {
+                              setEditingRoom(room);
+                              editRoomForm.setFieldsValue({
+                                name: room.name,
+                                capacity: room.capacity,
+                                slotDurationMinutes: room.slotDurationMinutes,
+                                availableFrom: dayjs(room.availableFrom, 'mm').startOf('day').add(room.availableFrom, 'minute'),
+                                availableTo: dayjs(room.availableTo, 'mm').startOf('day').add(room.availableTo, 'minute'),
+                                color: room.color
+                              });
+                              setIsEditModalVisible(true);
+                            }}
+                          />
+                        </Tooltip>,
                         <Tooltip title="Delete Room">
                           <Button
                             type="text"
@@ -366,7 +433,7 @@ const Admin = () => {
                           />
                         }
                         title={<span className="font-semibold">{room.name}</span>}
-                        description={`Capacity: ${room.capacity} people`}
+                        description={`Capacity: ${room.capacity} people • Slot: ${room.slotDurationMinutes}min`}
                       />
                     </List.Item>
                   )}
@@ -376,6 +443,49 @@ const Admin = () => {
           </Tabs.TabPane>
         </Tabs>
       </Content>
+
+      <Modal
+        title="Edit Room"
+        visible={isEditModalVisible}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          setEditingRoom(null);
+          editRoomForm.resetFields();
+        }}
+        footer={[
+          <Button key="cancel" onClick={() => {
+            setIsEditModalVisible(false);
+            setEditingRoom(null);
+            editRoomForm.resetFields();
+          }}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" loading={loading} onClick={() => editRoomForm.submit()}>
+            Update Room
+          </Button>
+        ]}
+      >
+        <Form form={editRoomForm} onFinish={handleEditRoom} layout="vertical">
+          <Form.Item name="name" label="Room Name" rules={[{ required: true }]}>
+            <Input size="large" placeholder="e.g., Conference Room A" />
+          </Form.Item>
+          <Form.Item name="capacity" label="Capacity" rules={[{ required: true }]}>
+            <InputNumber min={1} size="large" className="w-full" placeholder="Number of people" />
+          </Form.Item>
+          <Form.Item name="slotDurationMinutes" label="Slot Duration (minutes)">
+            <InputNumber min={15} step={15} size="large" className="w-full" />
+          </Form.Item>
+          <Form.Item name="availableFrom" label="Available From">
+            <TimePicker format="HH:mm" size="large" className="w-full" />
+          </Form.Item>
+          <Form.Item name="availableTo" label="Available To">
+            <TimePicker format="HH:mm" size="large" className="w-full" />
+          </Form.Item>
+          <Form.Item name="color" label="Color">
+            <ColorPicker showText size="large" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   );
 };
