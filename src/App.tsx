@@ -7,6 +7,7 @@ import { Route } from "react-router-dom"; // Updated import
 import { ThemeProvider } from "./components/theme-provider";
 import SplashScreen from './components/SplashScreen';
 import IdleOverlayHandler from './components/IdleOverlayHandler'; // Import IdleOverlayHandler
+import InstallPromptHandler from './components/InstallPromptHandler';
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <IdleOverlayHandler /> {/* Render IdleOverlayHandler */}
+          <InstallPromptHandler />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

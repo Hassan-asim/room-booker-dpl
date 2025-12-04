@@ -19,6 +19,11 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Enable plugin in development so the service worker and manifest
+      // are available when running the dev server (localhost)
+      devOptions: {
+        enabled: true,
+      },
       // Removed includeAssets for explicit assets, VitePWA usually handles public dir implicitly
       // We will rely on manifest icons and direct links in index.html for other assets.
       manifest: {
